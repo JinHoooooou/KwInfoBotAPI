@@ -2,31 +2,31 @@
 
 1. https://api.slack.com에서 Start Building으로 app만들기
 
-![image-20200119130614441](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119130614441.png)
+![image-20200119130614441](README.assets/image-20200119130614441.png)
 
 2. app 이름과 작업수행할 workspace선택
 
-![image-20200119130807115](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119130807115.png)
+![image-20200119130807115](README.assets/image-20200119130807115.png)
 
 3. 첫 화면에서 Bot Users 탭 선택
 
-![image-20200119130851528](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119130851528.png)
+![image-20200119130851528](README.assets/image-20200119130851528.png)
 
 4. Add Bot User 후 display name, default username작성, always .. on 선택
 
-![image-20200119131256740](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119131256740.png)
+![image-20200119131256740](README.assets/image-20200119131256740.png)
 
 5. Event Subscriptions에서 Enable Events On
 
-![image-20200119131335435](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119131335435.png)
+![image-20200119131335435](README.assets/image-20200119131335435.png)
 
 5. 1. Request URL을 입력하기 위한 Spring boot 실행
 
-![image-20200119131940527](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119131940527.png)
+![image-20200119131940527](README.assets/image-20200119131940527.png)
 
 5. 2. Controller 작성
 
-![image-20200119133351530](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119133351530.png)
+![image-20200119133351530](README.assets/image-20200119133351530.png)
 
 Request URL 확인용
 
@@ -40,7 +40,7 @@ Request URL 확인용
 
 5. 3. Spring boot 실행 후 Forwarding을 위한 ngrok 실행
 
-![image-20200119132614299](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119132614299.png)
+![image-20200119132614299](README.assets/image-20200119132614299.png)
 
 명령어 : ngork http 8080
 
@@ -48,39 +48,39 @@ Forwarding 된 url을 Request URL에 입력
 
 5. 4. 결과확인
 
-![image-20200119134625650](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119134625650.png)
+![image-20200119134625650](README.assets/image-20200119134625650.png)
 
 Challenge parameter를 Response로 보내줘야한다.
 
-![image-20200119134700104](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119134700104.png)
+![image-20200119134700104](README.assets/image-20200119134700104.png)
 
 > @Controller 를 사용했을때는 404, @RestController를 사용했을때는 200
 
-![image-20200119134743022](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119134743022.png)
+![image-20200119134743022](README.assets/image-20200119134743022.png)
 
 RequestBody로 전송된 Json형태의 파라미터들, challenge parameter값을 return해주어야한다.
 
 5. 5. Response로 전송
 
-![image-20200119135738751](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119135738751.png)
+![image-20200119135738751](README.assets/image-20200119135738751.png)
 
 > 메소드에 @RespnseBody추가
 >
 > Challenge code return
 
-![image-20200119135829390](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119135829390.png)
+![image-20200119135829390](README.assets/image-20200119135829390.png)
 
 > Verified 확인
 
 6. Subscribe to bot events에 이벤트 추가
 
-![image-20200119140139807](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119140139807.png)
+![image-20200119140139807](README.assets/image-20200119140139807.png)
 
 > app_mention과 message.channels추가
 
 7. Install App으로 workspace에 app추가
 
-![image-20200119140350252](Slack Echo Chat Bot 만들기 Flow.assets/image-20200119140350252.png)
+![image-20200119140350252](README.assets/image-20200119140350252.png)
 
 8. 메시지 보내보고 테스트
 
