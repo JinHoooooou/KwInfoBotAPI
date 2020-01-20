@@ -24,7 +24,7 @@
 
 ## Architecture
 
-![image-20200111151820496](README.assets/image-20200111151820496.png)
+![image-20200115165300095](README.assets/image-20200115165300095.png)
 
 ## Requirements
 
