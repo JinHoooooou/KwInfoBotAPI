@@ -31,7 +31,7 @@ public class KwInfoBotController {
 	/* Challenge 파라미터 갱신용
 	 * 
 	 * 
-	@RequestMapping(value = "/echobot", method=RequestMethod.POST)
+	@RequestMapping(value = "/kwinfobot", method=RequestMethod.POST)
 	public String ChallengeParameterCheck(@RequestBody HashMap<String, Object> requestURL) {
 		System.out.println(requestURL);
 		String challenge_parameter = requestURL.get("challenge").toString();
@@ -41,7 +41,7 @@ public class KwInfoBotController {
 	*/
 	
 	
-	@RequestMapping(value = "/echobot", method = RequestMethod.POST)
+	@RequestMapping(value = "/kwinfobot", method = RequestMethod.POST)
 	public String ReceiveMessage(@RequestBody RequestBodyDTO request) throws URISyntaxException {
 		Event event = request.getEvent();				//RequestBody의 Event
 		if(event.getType().equals("app_mention")) {
