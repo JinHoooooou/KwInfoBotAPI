@@ -1,4 +1,4 @@
-package com.slcak.echobot.controller;
+package com.slack.chatbot.controller;
 
 
 import java.net.URI;
@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.slcak.echobot.dto.Event;
-import com.slcak.echobot.dto.RequestBodyDTO;
-import com.slcak.echobot.dto.SendRequsetDTO;
+import com.slack.chatbot.dto.Event;
+import com.slack.chatbot.dto.RequestBodyDTO;
+import com.slack.chatbot.dto.SendRequsetDTO;
 
 @RestController
-public class EchoBotController {
+public class KwInfoBotController {
 	
 	/* Challenge 파라미터 갱신용
 	 * 
@@ -39,6 +39,7 @@ public class EchoBotController {
 		return challenge_parameter;
 	}
 	*/
+	
 	
 	@RequestMapping(value = "/echobot", method = RequestMethod.POST)
 	public String ReceiveMessage(@RequestBody RequestBodyDTO request) throws URISyntaxException {

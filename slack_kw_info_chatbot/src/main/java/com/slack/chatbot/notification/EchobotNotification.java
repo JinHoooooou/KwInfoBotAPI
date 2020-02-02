@@ -1,4 +1,4 @@
-package com.slack.echobot.notification;
+package com.slack.chatbot.notification;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

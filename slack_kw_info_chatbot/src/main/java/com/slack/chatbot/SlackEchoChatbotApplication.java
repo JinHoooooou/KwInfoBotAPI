@@ -1,4 +1,4 @@
-package com.slcak.echobot;
+package com.slack.chatbot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package com.slcak.echobot.dto;
+package com.slack.chatbot.dto;
 
 
 import lombok.Getter;
