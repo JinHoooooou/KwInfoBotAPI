@@ -17,4 +17,5 @@ public class RequestBodyDTO {
 	private String type;
 	private String token;
 	private Event event;
+	private String challenge;
 }
