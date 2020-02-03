@@ -25,7 +25,10 @@ public class KwInfoBotController {
 			return request.getChallenge();
 		
 		else if(request.getEvent().getType().equals("app_mention")) {
-			kwInfoBotService.echoMyMessage(request);
+			if(request.getEvent().getText().contains("버스")) {
+				kwInfoBotService.sendBusInfo(request);
+			}
+			else kwInfoBotService.echoMyMessage(request);
 		}		
 		
 		return "";
