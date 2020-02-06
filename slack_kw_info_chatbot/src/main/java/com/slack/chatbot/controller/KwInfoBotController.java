@@ -1,17 +1,13 @@
 package com.slack.chatbot.controller;
 
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.xml.sax.SAXException;
 
 import com.slack.chatbot.dto.RequestBodyDTO;
 import com.slack.chatbot.service.KwInfoBotService;
