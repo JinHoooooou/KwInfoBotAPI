@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -88,8 +90,26 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	}
 
 	@Override
-	public void sendNoticeKwInfo(RequestBodyDTO request) {
+	public void sendNoticeKwInfo(RequestBodyDTO request) throws Exception {
+		String url = "https://www.kw.ac.kr/ko/life/notice.jsp";
+		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
+		Elements element = doc.select("div.list-box");
 		
-		
+		StringBuffer printMessage = new StringBuffer();
+		printMessage.append("공지사항 : " + url + "\n\n" );
+		int count = 0;
+
+		for(org.jsoup.nodes.Element el : element.select("li")) {
+			String text = el.select("a").text();
+			String info = el.select("p.info").text();
+			if(text.contains("Attachment")) text = text.replaceAll("Attachment", "");
+			if(text.contains("신규게시글"))	 text = text.replaceAll("신규게시글", "");
+			printMessage.append((count+1) + ". " + text + "\n" + "\t\t" + info + "\n\n\n");
+			count++;
+			if(count==25)
+				break;
+		}
+		System.out.println(printMessage.toString());
+		BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());
 	}
 }
