@@ -40,9 +40,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			}
 		}
 	}
-
-
-
+	
 	@Override
 	public void sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
 		// request to open api
@@ -87,5 +85,11 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 		ResponseEntity<String> response = restTemplate.postForEntity(uri, parameters, String.class);
 		restTemplate.delete(baseUrl);
+	}
+
+	@Override
+	public void sendNoticeKwInfo(RequestBodyDTO request) {
+		
+		
 	}
 }

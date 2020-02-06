@@ -15,4 +15,6 @@ public interface KwInfoBotService {
 
 	public void sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException;
 
+	public void sendNoticeKwInfo(RequestBodyDTO request);
+
 }
