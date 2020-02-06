@@ -23,7 +23,7 @@ public class KwInfoBotController {
 	private KwInfoBotService kwInfoBotService;
 	
 	@RequestMapping(value = "/kwinfobot", method = RequestMethod.POST)
-	public String giveServiceToSlack(@RequestBody RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
+	public String giveServiceToSlack(@RequestBody RequestBodyDTO request) throws Exception {
 		
 		if(request.getChallenge()!=null)	//first connection(event subscribe)
 			return request.getChallenge();
@@ -31,6 +31,9 @@ public class KwInfoBotController {
 		else if(request.getEvent().getType().equals("app_mention")) {
 			if(request.getEvent().getText().contains("버스")) {
 				kwInfoBotService.sendBusInfo(request);
+			}
+			else if(request.getEvent().getText().contains("공지")) {
+				kwInfoBotService.sendNoticeKwInfo(request);
 			}
 			else kwInfoBotService.echoMyMessage(request);
 		}		
