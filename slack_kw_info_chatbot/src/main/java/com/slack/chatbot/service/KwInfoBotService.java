@@ -17,4 +17,6 @@ public interface KwInfoBotService {
 
 	public void sendNoticeKwInfo(RequestBodyDTO request) throws Exception;
 
+	public void sendStudyRoomSeatInfo(RequestBodyDTO request) throws IOException, URISyntaxException;
+
 }

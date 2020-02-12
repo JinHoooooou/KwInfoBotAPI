@@ -31,6 +31,9 @@ public class KwInfoBotController {
 			else if(request.getEvent().getText().contains("공지")) {
 				kwInfoBotService.sendNoticeKwInfo(request);
 			}
+			else if(request.getEvent().getText().contains("열람실")) {
+				kwInfoBotService.sendStudyRoomSeatInfo(request);
+			}
 			else kwInfoBotService.echoMyMessage(request);
 		}		
 		

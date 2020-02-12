@@ -74,21 +74,6 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		}
 	}
 	
-	private void BotSendMessageToUser(String message, String channel) throws URISyntaxException {
-
-		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
-		parameters.add("text", message);
-		parameters.add("channel", channel);
-		parameters.add("token", "xoxb-892170117313-902396819217-Jmown4sbBelQMsCz2vXrdM97");
-
-		RestTemplate restTemplate = new RestTemplate();
-		final String baseUrl = "https://slack.com/api/chat.postMessage";
-		URI uri = new URI(baseUrl);
-
-		ResponseEntity<String> response = restTemplate.postForEntity(uri, parameters, String.class);
-		restTemplate.delete(baseUrl);
-	}
-
 	@Override
 	public void sendNoticeKwInfo(RequestBodyDTO request) throws Exception {
 		String url = "https://www.kw.ac.kr/ko/life/notice.jsp";
@@ -111,5 +96,39 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		}
 		System.out.println(printMessage.toString());
 		BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+	}
+
+	@Override
+	public void sendStudyRoomSeatInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
+		String url = "http://mobileid.kw.ac.kr/seatweb/domian5.asp";
+		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
+		
+		Elements table = doc.getElementsByTag("tr");
+		StringBuffer printMessage = new StringBuffer();
+		printMessage.append("도서관 열람실 정보(전체/사용/잔여)\n");
+		for(org.jsoup.nodes.Element tableRow : table) {
+			Elements seatInfo = tableRow.getElementsByTag("td");
+			String roomNum = seatInfo.get(0).text();
+			if(roomNum.matches("[1-3]")){
+				printMessage.append("제 " + roomNum + " 열람실 : " + seatInfo.get(2).text() + "/" + seatInfo.get(3).text() + "/" + seatInfo.get(4).text()+ "\n");
+			}
+		}
+		BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());		
+	}
+	
+	
+	private void BotSendMessageToUser(String message, String channel) throws URISyntaxException {
+
+		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
+		parameters.add("text", message);
+		parameters.add("channel", channel);
+		parameters.add("token", "xoxb-892170117313-902396819217-Jmown4sbBelQMsCz2vXrdM97");
+
+		RestTemplate restTemplate = new RestTemplate();
+		final String baseUrl = "https://slack.com/api/chat.postMessage";
+		URI uri = new URI(baseUrl);
+
+		ResponseEntity<String> response = restTemplate.postForEntity(uri, parameters, String.class);
+		restTemplate.delete(baseUrl);
 	}
 }
