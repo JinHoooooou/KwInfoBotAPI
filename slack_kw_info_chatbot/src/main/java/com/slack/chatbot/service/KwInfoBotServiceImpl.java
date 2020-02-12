@@ -1,27 +1,24 @@
 package com.slack.chatbot.service;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.slack.chatbot.dto.Event;
 import com.slack.chatbot.dto.RequestBodyDTO;
+import com.slack.chatbot.message.ChatBotMessage;
 
 @Service("kwInfoBotService")
 public class KwInfoBotServiceImpl implements KwInfoBotService {
