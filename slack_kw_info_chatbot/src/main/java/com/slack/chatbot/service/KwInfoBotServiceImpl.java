@@ -33,7 +33,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 				int indexOfBotName = userMessage.indexOf(findSlackBotName);
 				if (indexOfBotName + findSlackBotName.length() < userMessage.length()) {
 					String echoMessage = userMessage.substring(indexOfBotName + findSlackBotName.length() + 1);
-					BotSendMessageToUser(echoMessage, event.getChannel());
+					SendBotMessageToUser(echoMessage, event.getChannel());
 				}
 				break;
 			}
@@ -44,85 +44,73 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	@Override
 	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
 		// request to open api
-		final String busAPiBaseUrl = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRoute"
+		final String busAPiUrl = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRoute"
 				+ "?serviceKey=7jHs%2Bx3TFCBGi9X0WFnQeUXUpCC7KJLJ1aA%2BmM3j8cJau%2B67c22LhWy%2FmkWvLG7m%2BieC4iQay%2FgroMRytDrmzQ%3D%3D"
 				+ "&stId=110000234"
 				+ "&busRouteId=100100130"
 				+ "&ord=5";
-		URI busApiUri = new URI(busAPiBaseUrl);		
-		RestTemplate busApiRestTemplate = new RestTemplate();
-
-		String responseOpenApiToSpring = busApiRestTemplate.getForObject(busApiUri, String.class);
-
-		StringReader sr = new StringReader(responseOpenApiToSpring);
-		InputSource is = new InputSource(sr);
-		try {
-			Document parseXmlData = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-			Element rootTag = parseXmlData.getDocumentElement();
-			String firstArriveMessage1 = rootTag.getElementsByTagName("arrmsg1").item(0).getFirstChild().getNodeValue();
-			String secondArriveMessage2 = rootTag.getElementsByTagName("arrmsg2").item(0).getFirstChild().getNodeValue();
-			String busNumber = rootTag.getElementsByTagName("rtNm").item(0).getFirstChild().getNodeValue();
-			StringBuffer printMessage = new StringBuffer();
-			printMessage.append(busNumber + "번 버스 도착 정보 입니다\n" + "첫번째 버스 : "
-					+ firstArriveMessage1 + "\n" + "두번째 버스 : " + secondArriveMessage2);
-			
-			BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	public boolean sendNoticeKwInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
+		Document responseData = Jsoup.connect(busAPiUrl).ignoreContentType(true).get();
 		
-		
-		String url = "https://www.kw.ac.kr/ko/life/notice.jsp";
-		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
-		Elements element = doc.select("div.list-box");
+		String firstArriveMessage = responseData.getElementsByTag("arrmsg1").text();
+		String secondArriveMessage = responseData.getElementsByTag("arrmsg2").text();
+		String busNumber = responseData.getElementsByTag("rtNm").text();
 		
 		StringBuffer printMessage = new StringBuffer();
-		printMessage.append("공지사항 : " + url + "\n\n" );
+		printMessage.append(busNumber + ChatBotMessage.BUS_API_MESSAGE.getMessage() +
+							ChatBotMessage.BUS_API_FIRST_BUS.getMessage() + firstArriveMessage + "\n" +
+							ChatBotMessage.BUS_API_SECOND_BUS.getMessage() + secondArriveMessage +"\n");
+		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		return true;
+	}
+
+	@Override
+	public boolean sendNoticeKwInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
+		String url = "https://www.kw.ac.kr/ko/life/notice.jsp";
+		Document responseData = Jsoup.connect(url).ignoreContentType(true).get();
+		Elements notices = responseData.select("div.list-box");
+		
+		StringBuffer printMessage = new StringBuffer();
+		printMessage.append(ChatBotMessage.KWU_NOTICE_MESSAGE.getMessage());
 		int count = 0;
 
-		for(org.jsoup.nodes.Element el : element.select("li")) {
+		for(org.jsoup.nodes.Element el : notices.select("li")) {
 			String text = el.select("a").text();
 			String info = el.select("p.info").text();
 			if(text.contains("Attachment")) text = text.replaceAll("Attachment", "");
 			if(text.contains("신규게시글"))	 text = text.replaceAll("신규게시글", "");
-			printMessage.append((count+1) + ". " + text + "\n" + "\t\t" + info + "\n\n\n");
+			printMessage.append((count+1) + ". " + text + "\n" + info + "\n\n");
 			count++;
-			if(count==25)
-				break;
+			if(count==25) break;
 		}
-		System.out.println(printMessage.toString());
-		BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		
+		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		return true;
 	}
 
 	@Override
 	public boolean sendStudyRoomSeatInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
 		String url = "http://mobileid.kw.ac.kr/seatweb/domian5.asp";
-		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
+		Document responseData = Jsoup.connect(url).get();
+		Elements table = responseData.select("tr");
 		
-		Elements table = doc.getElementsByTag("tr");
 		StringBuffer printMessage = new StringBuffer();
-		printMessage.append("도서관 열람실 정보(전체/사용/잔여)\n");
+		printMessage.append(ChatBotMessage.KWU_NOTICE_MESSAGE.getMessage());
 		for(org.jsoup.nodes.Element tableRow : table) {
-			Elements seatInfo = tableRow.getElementsByTag("td");
+			Elements seatInfo = tableRow.select("td");
 			String roomNum = seatInfo.get(0).text();
 			if(roomNum.matches("[1-3]")){
 				printMessage.append("제 " + roomNum + " 열람실 : " + seatInfo.get(2).text() + "/" + seatInfo.get(3).text() + "/" + seatInfo.get(4).text()+ "\n");
 			}
 		}
-		BotSendMessageToUser(printMessage.toString(), request.getEvent().getChannel());		
+		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		return true;
 	}
 	
-	
-	private void BotSendMessageToUser(String message, String channel) throws URISyntaxException {
-
+	private void SendBotMessageToUser(String message, String channel) throws URISyntaxException {
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
 		parameters.add("text", message);
 		parameters.add("channel", channel);
-		parameters.add("token", "xoxb-892170117313-902396819217-Jmown4sbBelQMsCz2vXrdM97");
+		parameters.add("token", "xoxb-892170117313-902396819217-ZlU9s06beJ3MMsgNFvKsKN1v");
 
 		RestTemplate restTemplate = new RestTemplate();
 		final String baseUrl = "https://slack.com/api/chat.postMessage";
