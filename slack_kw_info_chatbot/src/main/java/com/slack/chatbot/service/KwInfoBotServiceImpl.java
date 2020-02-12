@@ -27,7 +27,7 @@ import com.slack.chatbot.dto.RequestBodyDTO;
 public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 	@Override
-	public void echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
+	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
 		Event event = request.getEvent();
 		String userMessage = event.getText();
 		String splitMessage[] = userMessage.split(" ");
@@ -41,10 +41,11 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 				break;
 			}
 		}
+		return true;
 	}
 	
 	@Override
-	public void sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
+	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
 		// request to open api
 		final String busAPiBaseUrl = "http://ws.bus.go.kr/api/rest/arrive/getArrInfoByRoute"
 				+ "?serviceKey=7jHs%2Bx3TFCBGi9X0WFnQeUXUpCC7KJLJ1aA%2BmM3j8cJau%2B67c22LhWy%2FmkWvLG7m%2BieC4iQay%2FgroMRytDrmzQ%3D%3D"
@@ -75,7 +76,9 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	}
 	
 	@Override
-	public void sendNoticeKwInfo(RequestBodyDTO request) throws Exception {
+	public boolean sendNoticeKwInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
+		
+		
 		String url = "https://www.kw.ac.kr/ko/life/notice.jsp";
 		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
 		Elements element = doc.select("div.list-box");
@@ -99,7 +102,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	}
 
 	@Override
-	public void sendStudyRoomSeatInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
+	public boolean sendStudyRoomSeatInfo(RequestBodyDTO request) throws IOException, URISyntaxException {
 		String url = "http://mobileid.kw.ac.kr/seatweb/domian5.asp";
 		org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
 		
