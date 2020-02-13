@@ -26,15 +26,15 @@ public class KwInfoBotController {
 		
 		else if(request.getEvent().getType().equals("app_mention")) {
 			if(request.getEvent().getText().contains("버스")) {
-				kwInfoBotService.sendBusInfo(request);
+				kwInfoBotService.SendBusInfo(request);
 			}
 			else if(request.getEvent().getText().contains("공지")) {
-				kwInfoBotService.sendNoticeKwInfo(request);
+				kwInfoBotService.SendKwuNotice(request);
 			}
 			else if(request.getEvent().getText().contains("열람실")) {
-				kwInfoBotService.sendStudyRoomSeatInfo(request);
+				kwInfoBotService.SendKwuStudyRoomSeat(request);
 			}
-			else kwInfoBotService.echoMyMessage(request);
+			else kwInfoBotService.EchoMyMessage(request);
 		}		
 		
 		return "";
