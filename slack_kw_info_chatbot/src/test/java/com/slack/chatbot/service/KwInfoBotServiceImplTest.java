@@ -2,23 +2,26 @@ package com.slack.chatbot.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import com.slack.chatbot.dto.RequestBodyDTO;
 
 class KwInfoBotServiceImplTest {
 
+	KwInfoBotServiceImpl testObject = new KwInfoBotServiceImpl();
+	RequestBodyDTO testParameter = new RequestBodyDTO();
 	@Test
-	void test() throws Exception {
-		KwInfoBotServiceImpl test = new KwInfoBotServiceImpl();
-		RequestBodyDTO request = new RequestBodyDTO();
-		//assertEquals(true, test.sendStudyRoomSeatInfo(request));
-		assertEquals(true, test.sendNoticeKwInfo(request));
+	void SendBusInfoTest() throws Exception {
+		assertTrue(testObject.SendBusInfo(testParameter));
+	}
+	
+	@Test
+	void SendKwuNoticeTest() throws Exception{
+		assertTrue(testObject.SendKwuNotice(testParameter));
+	}
+	
+	@Test
+	void SendKwuStudyRoomSeatTest() throws Exception{
+		assertTrue(testObject.SendKwuStudyRoomSeat(testParameter));
 	}
 }
