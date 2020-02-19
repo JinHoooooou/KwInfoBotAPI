@@ -27,7 +27,7 @@ import com.slack.chatbot.message.KwuUrl;
 @Service("kwInfoBotService")
 public class KwInfoBotServiceImpl implements KwInfoBotService {
 	@Override
-	public boolean EchoMyMessage(RequestBodyDTO request) throws URISyntaxException {
+	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
 		Event event = request.getEvent();
 		String userMessage = event.getText();
 		String splitMessage[] = userMessage.split(" ");
@@ -36,7 +36,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 				int indexOfBotName = userMessage.indexOf(findSlackBotName);
 				if (indexOfBotName + findSlackBotName.length() < userMessage.length()) {
 					String echoMessage = userMessage.substring(indexOfBotName + findSlackBotName.length() + 1);
-					SendBotMessageToUser(echoMessage, event.getChannel());
+					sendBotMessageToUser(echoMessage, event.getChannel());
 				}
 				break;
 			}
@@ -45,13 +45,13 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	}
 	
 	@Override
-	public boolean SendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
+	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
 		String busOpenApiUrl = BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl() +
 				BusOpenApiUrl.BUS_OPEN_API_SERVICE_KEY.getUrl() +
 				BusOpenApiUrl.BUS_OPEN_API_KWU_STID.getUrl() +
 				BusOpenApiUrl.BUS_OPEN_API_1017_ROUTE_ID.getUrl() +
 				BusOpenApiUrl.BUS_OPEN_API_KWU_ORD.getUrl();
-		Document responseData = GetDataUsingJsoup(busOpenApiUrl);
+		Document responseData = getDataUsingJsoup(busOpenApiUrl);
 		
 		String firstArriveMessage = responseData.getElementsByTag("arrmsg1").text();
 		String secondArriveMessage = responseData.getElementsByTag("arrmsg2").text();
@@ -62,14 +62,14 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 							BusOpenApiMessage.BUS_API_FIRST_BUS.getMessage() + firstArriveMessage + "\n" +
 							BusOpenApiMessage.BUS_API_SECOND_BUS.getMessage() + secondArriveMessage +"\n");
 		System.out.println(printMessage);
-		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
 		return true;
 	}
 
 	@Override
-	public boolean SendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException {
+	public boolean sendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException {
 		String kwuNoitceUrl = KwuUrl.KWU_NOTICE_URL.getUrl();
-		Document responseData = GetDataUsingJsoup(kwuNoitceUrl);
+		Document responseData = getDataUsingJsoup(kwuNoitceUrl);
 		
 		Elements notices = responseData.select("div.list-box");
 		StringBuffer printMessage = new StringBuffer();
@@ -86,14 +86,14 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			if(count==25) break;
 		}
 		System.out.println(printMessage);
-		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
 		return true;
 	}
 
 	@Override
-	public boolean SendKwuStudyRoomSeat(RequestBodyDTO request) throws IOException, URISyntaxException {
+	public boolean sendKwuStudyRoomSeat(RequestBodyDTO request) throws IOException, URISyntaxException {
 		String kwuStudyRoomUrl = KwuUrl.KWU_STUDY_ROOM_URL.getUrl();
-		Document responseData = GetDataUsingJsoup(kwuStudyRoomUrl);
+		Document responseData = getDataUsingJsoup(kwuStudyRoomUrl);
 		
 		Elements table = responseData.select("tr");
 		StringBuffer printMessage = new StringBuffer();
@@ -106,16 +106,16 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			}
 		}
 		System.out.println(printMessage);
-		SendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
 		return true;
 	}
 	
-	private Document GetDataUsingJsoup(String url) throws IOException {
+	private Document getDataUsingJsoup(String url) throws IOException {
 		Document doc = Jsoup.connect(url).ignoreContentType(true).get();
 		return doc;
 	}
 
-	private void SendBotMessageToUser(String message, String channel) throws URISyntaxException {
+	private void sendBotMessageToUser(String message, String channel) throws URISyntaxException {
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
 		parameters.add("text", message);
 		parameters.add("channel", channel);

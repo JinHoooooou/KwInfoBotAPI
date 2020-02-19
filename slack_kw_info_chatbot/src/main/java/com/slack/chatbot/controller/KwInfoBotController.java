@@ -1,14 +1,10 @@
 package com.slack.chatbot.controller;
 
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.slack.chatbot.dto.RequestBodyDTO;
 import com.slack.chatbot.service.KwInfoBotService;
 
@@ -23,18 +19,17 @@ public class KwInfoBotController {
 		
 		if(request.getChallenge()!=null)	//first connection(event subscribe)
 			return request.getChallenge();
-		
 		else if(request.getEvent().getType().equals("app_mention")) {
 			if(request.getEvent().getText().contains("버스")) {
-				kwInfoBotService.SendBusInfo(request);
+				kwInfoBotService.sendBusInfo(request);
 			}
 			else if(request.getEvent().getText().contains("공지")) {
-				kwInfoBotService.SendKwuNotice(request);
+				kwInfoBotService.sendKwuNotice(request);
 			}
 			else if(request.getEvent().getText().contains("열람실")) {
-				kwInfoBotService.SendKwuStudyRoomSeat(request);
+				kwInfoBotService.sendKwuStudyRoomSeat(request);
 			}
-			else kwInfoBotService.EchoMyMessage(request);
+			else kwInfoBotService.echoMyMessage(request);
 		}		
 		
 		return "";
