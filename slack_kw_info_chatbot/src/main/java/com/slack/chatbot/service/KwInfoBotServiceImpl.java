@@ -16,7 +16,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.xml.sax.SAXException;
 
-import com.slack.chatbot.dto.Event;
 import com.slack.chatbot.dto.RequestBodyDTO;
 import com.slack.chatbot.message.BusOpenApiMessage;
 import com.slack.chatbot.message.BusOpenApiUrl;
@@ -28,22 +27,17 @@ import com.slack.chatbot.message.KwuUrl;
 public class KwInfoBotServiceImpl implements KwInfoBotService {
 	@Override
 	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
-		Event event = request.getEvent();
-		String userMessage = event.getText();
-		String splitMessage[] = userMessage.split(" ");
-		for (String findSlackBotName : splitMessage) {
-			if (findSlackBotName.equals("<@USJBNQ36D>")) {
-				int indexOfBotName = userMessage.indexOf(findSlackBotName);
-				if (indexOfBotName + findSlackBotName.length() < userMessage.length()) {
-					String echoMessage = userMessage.substring(indexOfBotName + findSlackBotName.length() + 1);
-					sendBotMessageToUser(echoMessage, event.getChannel());
-				}
-				break;
-			}
+		String messageFromUser = request.getEvent().getText();
+		String SLACK_BOT_NAME = "<@USJBNQ36>";
+		if(isCorrectBotName(messageFromUser, SLACK_BOT_NAME)){
+			String echoMessage = extractMyMessage(messageFromUser, SLACK_BOT_NAME);
+			sendBotMessageToChannel(echoMessage,request.getEvent().getChannel());
+			return true;
 		}
-		return true;
+		else
+			return false;
 	}
-	
+
 	@Override
 	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
 		String busOpenApiUrl = BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl() +
@@ -108,6 +102,19 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		System.out.println(printMessage);
 		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
 		return true;
+	}
+
+	private String extractMyMessage(String messageFromUser, String slackBotName) {
+		return messageFromUser.substring(messageFromUser.indexOf(slackBotName) + slackBotName.length() + 1);
+	}
+
+	private boolean isCorrectBotName(String messageFromUser, String slackBotName) {
+		for(String eachWord : messageFromUser.split(" ")){
+			if(eachWord.equals(slackBotName) && messageFromUser.split(" ").length!=1) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private Document getDataUsingJsoup(String url) throws IOException {
