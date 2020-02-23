@@ -25,11 +25,12 @@ import com.slack.chatbot.message.KwuUrl;
 
 @Service("kwInfoBotService")
 public class KwInfoBotServiceImpl implements KwInfoBotService {
+	private final static String SLACK_BOT_NAME = "<@USJBNQ36>";
+
 	@Override
 	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
 		String messageFromUser = request.getEvent().getText();
-		String SLACK_BOT_NAME = "<@USJBNQ36>";
-		if(isCorrectBotName(messageFromUser, SLACK_BOT_NAME)){
+		if(containCorrectBotName(messageFromUser, SLACK_BOT_NAME)){
 			String echoMessage = extractMyMessage(messageFromUser, SLACK_BOT_NAME);
 			sendBotMessageToChannel(echoMessage,request.getEvent().getChannel());
 			return true;
@@ -108,7 +109,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		return messageFromUser.substring(messageFromUser.indexOf(slackBotName) + slackBotName.length() + 1);
 	}
 
-	private boolean isCorrectBotName(String messageFromUser, String slackBotName) {
+	private boolean containCorrectBotName(String messageFromUser, String slackBotName) {
 		for(String eachWord : messageFromUser.split(" ")){
 			if(eachWord.equals(slackBotName) && messageFromUser.split(" ").length!=1) {
 				return true;
