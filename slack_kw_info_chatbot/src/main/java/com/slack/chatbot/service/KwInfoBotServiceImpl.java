@@ -35,8 +35,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			sendBotMessageToChannel(echoMessage,request.getEvent().getChannel());
 			return true;
 		}
-		else
-			return false;
+		return false;
 	}
 
 	@Override
@@ -123,7 +122,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		return doc;
 	}
 
-	private void sendBotMessageToUser(String message, String channel) throws URISyntaxException {
+	private void sendBotMessageToChannel(String message, String channel) throws URISyntaxException {
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
 		parameters.add("text", message);
 		parameters.add("channel", channel);
