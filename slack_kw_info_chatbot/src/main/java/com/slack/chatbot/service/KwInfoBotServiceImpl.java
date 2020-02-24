@@ -31,6 +31,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	private final static int KWU = 0;
 	private final static int HYUNDAI_APT = 1;
 	private final static int ANAM_STREET = 2;
+	private final static int KWU_NOTICE_COUNT = 25;
 
 	@Override
 	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
@@ -59,26 +60,13 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 	@Override
 	public boolean sendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException {
-		String kwuNoitceUrl = KwuUrl.KWU_NOTICE_URL.getUrl();
-		Document responseData = getDataUsingJsoup(kwuNoitceUrl);
-		
-		Elements notices = responseData.select("div.list-box");
-		StringBuffer printMessage = new StringBuffer();
-		printMessage.append(KwuNoticeMessage.KWU_NOTICE_MESSAGE.getMessage());
-		int count = 0;
-
-		for(org.jsoup.nodes.Element el : notices.select("li")) {
-			String text = el.select("a").text();
-			String info = el.select("p.info").text();
-			if(text.contains("Attachment")) text = text.replaceAll("Attachment", "");
-			if(text.contains("신규게시글"))	 text = text.replaceAll("신규게시글", "");
-			printMessage.append((count+1) + ". " + text + "\n" + info + "\n\n");
-			count++;
-			if(count==25) break;
+		if(containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)){
+			Elements kwuNoticeList = getXmlTagList(KwuUrl.KWU_NOTICE_URL.getUrl());
+			String printMessage = makeKwuNoticeMessageFormat(kwuNoticeList);
+			sendBotMessageToChannel(printMessage,request.getEvent().getChannel());
+			return true;
 		}
-		System.out.println(printMessage);
-		sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
-		return true;
+		return false;
 	}
 
 	@Override
@@ -132,7 +120,8 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 	private Elements getXmlTagList(String url) throws IOException {
 		Document xmlDocument = Jsoup.connect(url).ignoreContentType(true).get();
-		return xmlDocument.select("itemList");
+		String tags = url.contains("bus") ? "itemList" : "li.top-notice";
+		return xmlDocument.select(tags);
 	}
 
 	private String makeURL(int station) {
@@ -154,6 +143,19 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	private boolean isCorrectBusNumber(Element eachBus) {
 		return eachBus.select("rtNm").text().matches("173|1017");
 	}
+
+	private String makeKwuNoticeMessageFormat(Elements kwuNoticeList) {
+		String printMessage = KwuNoticeMessage.KWU_NOTICE_MESSAGE.getMessage();
+		for(int i = 0; i<KWU_NOTICE_COUNT; i++){
+			Element eachNotice = kwuNoticeList.get(i);
+			String title = eachNotice.select("a").text();
+			String createDate = eachNotice.select("p.info").text();
+			title = title.replaceAll("Attachment", "").replaceAll("신규게시글","");
+			printMessage += ((i+1) + ". " + title + "\n" + createDate + "\n\n");
+		}
+		return printMessage;
+	}
+
 	private Document getDataUsingJsoup(String url) throws IOException {
 		Document doc = Jsoup.connect(url).ignoreContentType(true).get();
 		return doc;
