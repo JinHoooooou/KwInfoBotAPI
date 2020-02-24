@@ -71,22 +71,13 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 	@Override
 	public boolean sendKwuStudyRoomSeat(RequestBodyDTO request) throws IOException, URISyntaxException {
-		String kwuStudyRoomUrl = KwuUrl.KWU_STUDY_ROOM_URL.getUrl();
-		Document responseData = getDataUsingJsoup(kwuStudyRoomUrl);
-		
-		Elements table = responseData.select("tr");
-		StringBuffer printMessage = new StringBuffer();
-		printMessage.append(KwuStudyRoomMessage.KWU_STUDY_ROOM_SEAT_INFO_MESSAGE.getMessage());
-		for(org.jsoup.nodes.Element tableRow : table) {
-			Elements seatInfo = tableRow.select("td");
-			String roomNum = seatInfo.get(0).text();
-			if(roomNum.matches("[1-3]")){
-				printMessage.append("제 " + roomNum + " 열람실 : " + seatInfo.get(2).text() + "/" + seatInfo.get(3).text() + "/" + seatInfo.get(4).text()+ "\n");
-			}
+		if(containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
+			Elements studyRoomList = getXmlTagList(KwuUrl.KWU_STUDY_ROOM_URL.getUrl());
+			String printMessage = makeKwuStudyRoomMessageFormat(studyRoomList);
+			sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
+			return true;
 		}
-		System.out.println(printMessage);
-		sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
-		return true;
+		return false;
 	}
 
 	private String extractMyMessage(String messageFromUser, String slackBotName) {
@@ -120,7 +111,10 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 	private Elements getXmlTagList(String url) throws IOException {
 		Document xmlDocument = Jsoup.connect(url).ignoreContentType(true).get();
-		String tags = url.contains("bus") ? "itemList" : "li.top-notice";
+		String tags="";
+		if(url.contains(BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl())) tags = "itemList";
+		else if(url.equals(KwuUrl.KWU_NOTICE_URL)) tags = "li.top-notice";
+		else tags = "tr";
 		return xmlDocument.select(tags);
 	}
 
@@ -156,9 +150,15 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		return printMessage;
 	}
 
-	private Document getDataUsingJsoup(String url) throws IOException {
-		Document doc = Jsoup.connect(url).ignoreContentType(true).get();
-		return doc;
+	private String makeKwuStudyRoomMessageFormat(Elements studyRoomList) {
+		String printMessage = KwuStudyRoomMessage.KWU_STUDY_ROOM_SEAT_INFO_MESSAGE.getMessage();
+		for (int i = 0; i<studyRoomList.size(); i++) {
+			Elements eachRoom = studyRoomList.get(i).select("td");
+			String roomNumber = eachRoom.get(0).text();
+			if(roomNumber.matches("[1-3]"))
+				printMessage += roomNumber + "열람실 " + eachRoom.get(2).text() + "/" + eachRoom.get(3).text() + "/" + eachRoom.get(4).text() +"\n";
+		}
+		return printMessage;
 	}
 
 	private void sendBotMessageToChannel(String message, String channel) throws URISyntaxException {
