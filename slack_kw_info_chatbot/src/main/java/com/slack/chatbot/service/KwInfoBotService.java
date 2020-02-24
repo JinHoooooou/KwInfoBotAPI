@@ -13,7 +13,7 @@ public interface KwInfoBotService {
 	
 	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException;
 
-	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException;
+	public boolean sendBusArriveTime(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException;
 
 	public boolean sendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException;
 

@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,10 @@ import com.slack.chatbot.message.KwuUrl;
 @Service("kwInfoBotService")
 public class KwInfoBotServiceImpl implements KwInfoBotService {
 	private final static String SLACK_BOT_NAME = "<@USJBNQ36>";
+	private final static int BUS_COUNT = 3;
+	private final static int KWU = 0;
+	private final static int HYUNDAI_APT = 1;
+	private final static int ANAM_STREET = 2;
 
 	@Override
 	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
@@ -39,25 +44,17 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	}
 
 	@Override
-	public boolean sendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
-		String busOpenApiUrl = BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl() +
-				BusOpenApiUrl.BUS_OPEN_API_SERVICE_KEY.getUrl() +
-				BusOpenApiUrl.BUS_OPEN_API_KWU_STID.getUrl() +
-				BusOpenApiUrl.BUS_OPEN_API_1017_ROUTE_ID.getUrl() +
-				BusOpenApiUrl.BUS_OPEN_API_KWU_ORD.getUrl();
-		Document responseData = getDataUsingJsoup(busOpenApiUrl);
-		
-		String firstArriveMessage = responseData.getElementsByTag("arrmsg1").text();
-		String secondArriveMessage = responseData.getElementsByTag("arrmsg2").text();
-		String busNumber = responseData.getElementsByTag("rtNm").text();
-		
-		StringBuffer printMessage = new StringBuffer();
-		printMessage.append(busNumber + BusOpenApiMessage.BUS_API_MESSAGE.getMessage() +
-							BusOpenApiMessage.BUS_API_FIRST_BUS.getMessage() + firstArriveMessage + "\n" +
-							BusOpenApiMessage.BUS_API_SECOND_BUS.getMessage() + secondArriveMessage +"\n");
-		System.out.println(printMessage);
-		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
-		return true;
+	public boolean sendBusArriveTime(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
+		if(containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)){
+			for(int i = 0; i<BUS_COUNT; i++){
+				String busOpenApiUrl = makeURL(i);
+				Elements busListOfStation = getXmlTagList(busOpenApiUrl);
+				String printMessage = makeBusArriveMessageFormat(busListOfStation);
+				sendBotMessageToChannel(printMessage, request.getEvent().getChannel());
+			}
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -80,7 +77,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			if(count==25) break;
 		}
 		System.out.println(printMessage);
-		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
 		return true;
 	}
 
@@ -100,7 +97,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 			}
 		}
 		System.out.println(printMessage);
-		sendBotMessageToUser(printMessage.toString(), request.getEvent().getChannel());
+		sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
 		return true;
 	}
 
@@ -116,7 +113,47 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		}
 		return false;
 	}
-	
+
+	private String makeBusArriveMessageFormat(Elements busListOfStation) {
+		String printMessage = "";
+		for(Element eachBus : busListOfStation){
+			if(isCorrectBusNumber(eachBus)){
+				String busNumber = eachBus.select("rtNm").text();
+				String station = eachBus.select("stNm").text();
+				String firstArriveMessage = eachBus.select("arrmsg1").text();
+				String secondArriveMessage = eachBus.select("arrmsg2").text();
+				printMessage += station + " " + busNumber + BusOpenApiMessage.BUS_API_MESSAGE.getMessage()
+						+ BusOpenApiMessage.BUS_API_FIRST_BUS.getMessage() + firstArriveMessage + "\n"
+						+ BusOpenApiMessage.BUS_API_SECOND_BUS.getMessage() + secondArriveMessage + "\n\n";
+			}
+		}
+		return printMessage;
+	}
+
+	private Elements getXmlTagList(String url) throws IOException {
+		Document xmlDocument = Jsoup.connect(url).ignoreContentType(true).get();
+		return xmlDocument.select("itemList");
+	}
+
+	private String makeURL(int station) {
+		String url = BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl() +
+				BusOpenApiUrl.BUS_OPEN_API_SERVICE_KEY.getUrl();
+		switch (station){
+			case KWU :
+				url += BusOpenApiUrl.BUS_OPEN_API_KWU_ARSID.getUrl();
+				break;
+			case HYUNDAI_APT :
+				url += BusOpenApiUrl.BUS_OPEN_API_HYUNDAI_APT_ARSID.getUrl();
+				break;
+			case ANAM_STREET :
+				url += BusOpenApiUrl.BUS_OPEN_API_ANAM_STREET_ARSID.getUrl();
+		}
+		return url;
+	}
+
+	private boolean isCorrectBusNumber(Element eachBus) {
+		return eachBus.select("rtNm").text().matches("173|1017");
+	}
 	private Document getDataUsingJsoup(String url) throws IOException {
 		Document doc = Jsoup.connect(url).ignoreContentType(true).get();
 		return doc;
