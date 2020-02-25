@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SlackEchoChatbotApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SlackEchoChatbotApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(SlackEchoChatbotApplication.class, args);
+  }
 
 }

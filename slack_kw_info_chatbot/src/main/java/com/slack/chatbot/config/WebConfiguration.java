@@ -10,16 +10,17 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class WebConfiguration {
 
-	@Bean
-	public RestTemplate restTemplate() {
-		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-		httpRequestFactory.setConnectTimeout(2000);
-		httpRequestFactory.setReadTimeout(3000);
-		HttpClient httpClient = HttpClientBuilder.create()
-				.setMaxConnTotal(200)
-				.setMaxConnPerRoute(20)
-				.build();
-		httpRequestFactory.setHttpClient(httpClient);
-		return new RestTemplate(httpRequestFactory);
-	}
+  @Bean
+  public RestTemplate restTemplate() {
+    HttpComponentsClientHttpRequestFactory httpRequestFactory =
+        new HttpComponentsClientHttpRequestFactory();
+    httpRequestFactory.setConnectTimeout(2000);
+    httpRequestFactory.setReadTimeout(3000);
+    HttpClient httpClient = HttpClientBuilder.create()
+        .setMaxConnTotal(200)
+        .setMaxConnPerRoute(20)
+        .build();
+    httpRequestFactory.setHttpClient(httpClient);
+    return new RestTemplate(httpRequestFactory);
+  }
 }

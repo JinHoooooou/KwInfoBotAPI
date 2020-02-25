@@ -1,6 +1,6 @@
 package com.slack.chatbot.service;
 
-import com.slack.chatbot.dto.RequestBodyDTO;
+import com.slack.chatbot.dto.RequestBodyDto;
 import com.slack.chatbot.message.BusOpenApiMessage;
 import com.slack.chatbot.message.BusOpenApiUrl;
 import com.slack.chatbot.message.KwuNoticeMessage;
@@ -34,7 +34,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
 
   @Override
-  public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException {
+  public boolean echoMyMessage(RequestBodyDto request) throws URISyntaxException {
     String messageFromUser = request.getEvent().getText();
     if (containCorrectBotName(messageFromUser, SLACK_BOT_NAME)) {
       String echoMessage = extractMyMessage(messageFromUser, SLACK_BOT_NAME);
@@ -45,7 +45,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   }
 
   @Override
-  public boolean sendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException {
+  public boolean sendKwuNotice(RequestBodyDto request) throws IOException, URISyntaxException {
     if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
       Elements kwuNoticeList = getXmlTagList(KwuUrl.KWU_NOTICE_URL.getUrl());
       String printMessage = makeKwuNoticeMessageFormat(kwuNoticeList);
@@ -56,7 +56,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   }
 
   @Override
-  public boolean sendBusArriveTime(RequestBodyDTO request)
+  public boolean sendBusArriveTime(RequestBodyDto request)
       throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
     if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
       for (int i = 0; i < BUS_COUNT; i++) {
@@ -71,7 +71,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   }
 
   @Override
-  public boolean sendKwuStudyRoomSeat(RequestBodyDTO request)
+  public boolean sendKwuStudyRoomSeat(RequestBodyDto request)
       throws IOException, URISyntaxException {
 
     if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {

@@ -1,6 +1,6 @@
 package com.slack.chatbot.controller;
 
-import com.slack.chatbot.dto.RequestBodyDTO;
+import com.slack.chatbot.dto.RequestBodyDto;
 import com.slack.chatbot.service.KwInfoBotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +15,7 @@ public class KwInfoBotController {
   private KwInfoBotService kwInfoBotService;
 
   @RequestMapping(value = "/kwinfobot", method = RequestMethod.POST)
-  public String giveServiceToSlack(@RequestBody RequestBodyDTO request) throws Exception {
+  public String giveServiceToSlack(@RequestBody RequestBodyDto request) throws Exception {
     if (request.getChallenge() != null) {
       return request.getChallenge();
     } else if (request.getEvent().getType().equals("app_mention")) {
