@@ -165,7 +165,6 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<String, String>();
 		parameters.add("text", message);
 		parameters.add("channel", channel);
-		parameters.add("token", "xoxb-892170117313-902396819217-ZlU9s06beJ3MMsgNFvKsKN1v");
 
 		RestTemplate restTemplate = new RestTemplate();
 		final String baseUrl = "https://slack.com/api/chat.postMessage";
