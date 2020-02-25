@@ -11,12 +11,12 @@ import com.slack.chatbot.dto.RequestBodyDTO;
 
 public interface KwInfoBotService {
 	
-	public boolean EchoMyMessage(RequestBodyDTO request) throws URISyntaxException;
+	public boolean echoMyMessage(RequestBodyDTO request) throws URISyntaxException;
 
-	public boolean SendBusInfo(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException;
+	public boolean sendBusArriveTime(RequestBodyDTO request) throws URISyntaxException, SAXException, IOException, ParserConfigurationException;
 
-	public boolean SendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException;
+	public boolean sendKwuNotice(RequestBodyDTO request) throws IOException, URISyntaxException;
 
-	public boolean SendKwuStudyRoomSeat(RequestBodyDTO request) throws IOException, URISyntaxException;
+	public boolean sendKwuStudyRoomSeat(RequestBodyDTO request) throws IOException, URISyntaxException;
 
 }
