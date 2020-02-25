@@ -112,9 +112,12 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 	private Elements getXmlTagList(String url) throws IOException {
 		Document xmlDocument = Jsoup.connect(url).ignoreContentType(true).get();
 		String tags="";
-		if(url.contains(BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl())) tags = "itemList";
-		else if(url.equals(KwuUrl.KWU_NOTICE_URL)) tags = "li.top-notice";
-		else tags = "tr";
+		if(url.contains(BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl()))
+		    tags = "itemList";
+		else if(url.equals(KwuUrl.KWU_NOTICE_URL))
+		    tags = "li.top-notice";
+		else
+		    tags = "tr";
 		return xmlDocument.select(tags);
 	}
 
