@@ -7,7 +7,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class BusApiResponseDTO {
-
-	private String message;
+public class BusApiResponseDto {
+  private String message;
 }
