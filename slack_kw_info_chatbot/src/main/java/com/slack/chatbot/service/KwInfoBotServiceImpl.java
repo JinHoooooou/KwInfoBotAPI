@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 @Service("kwInfoBotService")
 public class KwInfoBotServiceImpl implements KwInfoBotService {
 
-  private static final String SLACK_BOT_NAME = "<@USJBNQ36>";
+  private static final String SLACK_BOT_NAME = "<@USJBNQ36D>";
   private static final int BUS_COUNT = 3;
   private static final int KWU = 0;
   private static final int HYUNDAI_APT = 1;
