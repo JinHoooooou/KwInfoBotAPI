@@ -1,6 +1,7 @@
 package com.slack.chatbot.service;
 
 import com.slack.chatbot.dto.RequestBodyDto;
+import com.slack.chatbot.message.BicycleOpenApiUrl;
 import com.slack.chatbot.message.BusOpenApiMessage;
 import com.slack.chatbot.message.BusOpenApiUrl;
 import com.slack.chatbot.message.KwuNoticeMessage;
@@ -10,6 +11,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.xml.parsers.ParserConfigurationException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -84,6 +87,17 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
     return false;
   }
 
+  @Override
+  public boolean sendRentableBicycleCount(RequestBodyDto request) throws URISyntaxException {
+    String userMessage = request.getEvent().getText();
+    if (containCorrectBotName(userMessage)) {
+      JSONArray bicycleList = getBicycleList(BicycleOpenApiUrl.BICYCLE_OPEN_API_URL.getUrl());
+      String printMessage = makeRentableBicycleCountMessageFormat(bicycleList);
+      sendBotMessageToChannel(printMessage, request.getEvent().getChannel());
+      return true;
+    }
+    return false;
+  }
 
   private String extractMyMessage(String messageFromUser) {
     return messageFromUser
@@ -181,6 +195,30 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
       }
     }
     return printMessage;
+  }
+
+  private JSONArray getBicycleList(String url) {
+    RestTemplate restTemplate = new RestTemplate();
+    String bicycle = restTemplate
+        .getForObject(BicycleOpenApiUrl.BICYCLE_OPEN_API_URL.getUrl(), String.class);
+    JSONObject parseToJson = new JSONObject(bicycle);
+    return parseToJson.getJSONObject("rentBikeStatus").getJSONArray("row");
+  }
+
+  private String makeRentableBicycleCountMessageFormat(JSONArray bicycleList) {
+    StringBuilder printMessage = new StringBuilder();
+    for (int i = 0; i < bicycleList.length(); i++) {
+      JSONObject eachBicycle = bicycleList.getJSONObject(i);
+      String stationName = eachBicycle.get("stationName").toString();
+      String parkingBikeTotCnt = eachBicycle.get("parkingBikeTotCnt").toString();
+      if (stationName.contains("안암로터리")
+          || stationName.contains("광운")
+          || stationName.contains("동해문화")) {
+        printMessage.append(stationName).append(" 대여가능 자전거 : ").append(parkingBikeTotCnt)
+            .append("\n");
+      }
+    }
+    return printMessage.toString();
   }
 
   private void sendBotMessageToChannel(String message, String channel) throws URISyntaxException {

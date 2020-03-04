@@ -19,4 +19,6 @@ public interface KwInfoBotService {
   public boolean sendKwuStudyRoomSeat(RequestBodyDto request)
       throws IOException, URISyntaxException;
 
+  public boolean sendRentableBicycleCount(RequestBodyDto request) throws URISyntaxException;
+
 }
