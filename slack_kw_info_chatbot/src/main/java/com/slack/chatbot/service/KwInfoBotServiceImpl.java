@@ -58,13 +58,14 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   @Override
   public boolean sendBusArriveTime(RequestBodyDto request)
       throws URISyntaxException, SAXException, IOException, ParserConfigurationException {
-    if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
+    StringBuilder printMessage = new StringBuilder();
+    if (containCorrectBotName(request.getEvent().getText())) {
       for (int i = 0; i < BUS_COUNT; i++) {
         String busOpenApiUrl = makeUrl(i);
         Elements busListOfStation = getXmlTagList(busOpenApiUrl);
-        String printMessage = makeBusArriveMessageFormat(busListOfStation);
-        sendBotMessageToChannel(printMessage, request.getEvent().getChannel());
+        printMessage.append(makeBusArriveMessageFormat(busListOfStation));
       }
+      sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
       return true;
     }
     return false;
