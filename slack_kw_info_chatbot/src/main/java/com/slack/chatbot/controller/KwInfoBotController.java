@@ -25,6 +25,8 @@ public class KwInfoBotController {
         kwInfoBotService.sendKwuNotice(request);
       } else if (request.getEvent().getText().contains("열람실")) {
         kwInfoBotService.sendKwuStudyRoomSeat(request);
+      } else if (request.getEvent().getText().contains("따릉이")) {
+        kwInfoBotService.sendRentableBicycleCount(request);
       } else {
         kwInfoBotService.echoMyMessage(request);
       }
