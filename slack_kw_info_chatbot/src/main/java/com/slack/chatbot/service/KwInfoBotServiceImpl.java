@@ -36,8 +36,8 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   @Override
   public boolean echoMyMessage(RequestBodyDto request) throws URISyntaxException {
     String messageFromUser = request.getEvent().getText();
-    if (containCorrectBotName(messageFromUser, SLACK_BOT_NAME)) {
-      String echoMessage = extractMyMessage(messageFromUser, SLACK_BOT_NAME);
+    if (containCorrectBotName(messageFromUser)) {
+      String echoMessage = extractMyMessage(messageFromUser);
       sendBotMessageToChannel(echoMessage, request.getEvent().getChannel());
       return true;
     }
@@ -46,7 +46,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
 
   @Override
   public boolean sendKwuNotice(RequestBodyDto request) throws IOException, URISyntaxException {
-    if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
+    if (containCorrectBotName(request.getEvent().getText())) {
       Elements kwuNoticeList = getXmlTagList(KwuUrl.KWU_NOTICE_URL.getUrl());
       String printMessage = makeKwuNoticeMessageFormat(kwuNoticeList);
       sendBotMessageToChannel(printMessage, request.getEvent().getChannel());
@@ -74,24 +74,28 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   public boolean sendKwuStudyRoomSeat(RequestBodyDto request)
       throws IOException, URISyntaxException {
 
-    if (containCorrectBotName(request.getEvent().getText(), SLACK_BOT_NAME)) {
+    if (containCorrectBotName(request.getEvent().getText())) {
       Elements studyRoomList = getXmlTagList(KwuUrl.KWU_STUDY_ROOM_URL.getUrl());
       String printMessage = makeKwuStudyRoomMessageFormat(studyRoomList);
-      sendBotMessageToChannel(printMessage.toString(), request.getEvent().getChannel());
+      sendBotMessageToChannel(printMessage, request.getEvent().getChannel());
       return true;
     }
     return false;
   }
 
-  private String extractMyMessage(String messageFromUser, String slackBotName) {
+
+  private String extractMyMessage(String messageFromUser) {
     return messageFromUser
-        .substring(messageFromUser.indexOf(slackBotName) + slackBotName.length() + 1);
+        .substring(messageFromUser.indexOf(
+            KwInfoBotServiceImpl.SLACK_BOT_NAME) + KwInfoBotServiceImpl.SLACK_BOT_NAME.length()
+            + 1);
   }
 
-  private boolean containCorrectBotName(String messageFromUser, String slackBotName) {
+  private boolean containCorrectBotName(String messageFromUser) {
     String[] eachWord = messageFromUser.split(" ");
-    for (int i = 0; i < eachWord.length; i++) {
-      if (eachWord[i].equals(slackBotName) && !eachWord[eachWord.length - 1].equals(slackBotName)) {
+    for (String s : eachWord) {
+      if (s.equals(KwInfoBotServiceImpl.SLACK_BOT_NAME) && !eachWord[eachWord.length - 1].equals(
+          KwInfoBotServiceImpl.SLACK_BOT_NAME)) {
         return true;
       }
     }
@@ -99,19 +103,21 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
   }
 
   private String makeBusArriveMessageFormat(Elements busListOfStation) {
-    String printMessage = "";
+    StringBuilder printMessage = new StringBuilder();
     for (Element eachBus : busListOfStation) {
       if (isCorrectBusNumber(eachBus)) {
         String busNumber = eachBus.select("rtNm").text();
         String station = eachBus.select("stNm").text();
         String firstArriveMessage = eachBus.select("arrmsg1").text();
         String secondArriveMessage = eachBus.select("arrmsg2").text();
-        printMessage += station + " " + busNumber + BusOpenApiMessage.BUS_API_MESSAGE.getMessage()
-            + BusOpenApiMessage.BUS_API_FIRST_BUS.getMessage() + firstArriveMessage + "\n"
-            + BusOpenApiMessage.BUS_API_SECOND_BUS.getMessage() + secondArriveMessage + "\n\n";
+        printMessage.append(station).append(" ").append(busNumber)
+            .append(BusOpenApiMessage.BUS_API_MESSAGE.getMessage())
+            .append(BusOpenApiMessage.BUS_API_FIRST_BUS.getMessage()).append(firstArriveMessage)
+            .append("\n").append(BusOpenApiMessage.BUS_API_SECOND_BUS.getMessage())
+            .append(secondArriveMessage).append("\n\n");
       }
     }
-    return printMessage;
+    return printMessage.toString();
   }
 
   private Elements getXmlTagList(String url) throws IOException {
@@ -119,7 +125,7 @@ public class KwInfoBotServiceImpl implements KwInfoBotService {
     String tags = "";
     if (url.contains(BusOpenApiUrl.BUS_OPEN_API_BASE_URL.getUrl())) {
       tags = "itemList";
-    } else if (url.equals(KwuUrl.KWU_NOTICE_URL)) {
+    } else if (url.contains(KwuUrl.KWU_NOTICE_URL.getUrl())) {
       tags = "li.top-notice";
     } else {
       tags = "tr";
